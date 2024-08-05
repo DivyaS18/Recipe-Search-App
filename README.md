@@ -61,4 +61,7 @@ The Recipe Search App is a dynamic web application designed to help users find a
 
 Overall, the Recipe Search App provides a user-friendly platform for discovering and exploring recipes, it offers a robust and engaging recipe search experience.The Recipe Search App seamlessly integrates these technologies and APIs to deliver a robust recipe search experience. HTML and CSS create a clean and responsive design, while JavaScript ensures interactive and dynamic functionality. The Spoonacular API and Edamam API work together to provide both initial recipe data and detailed instructions, enhancing the overall usability and depth of the application.
 
+![RecipeSearchApp2](https://github.com/user-attachments/assets/dcab55ee-d8b7-4cc7-afe5-d6ffb2a316e7)
+![RecipeSearchApp](https://github.com/user-attachments/assets/dd520126-1e4f-4cf3-86b4-31a2dd952bd4)
+
 --- 
