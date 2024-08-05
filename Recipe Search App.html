@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recipe Search App</title>
+<style>
+
+html, body, div, h1, h2, h3, h4, h5, h6, p, ul, ol, li, img, button, input {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+body {
+  background-color: #fff; 
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); 
+}
+
+header {
+  background-color: #4CAF50; 
+  padding: 20px;
+  text-align: center;
+  border-bottom: 2px solid #ddd; 
+  border-radius: 10px 10px 0 0; 
+}
+
+header h1 {
+  font-size: 42px;
+  color: #333; 
+}
+
+.search-container {
+  margin-bottom: 20px;
+  padding: 20px;
+  background-color: #fff; 
+  border-radius: 10px; 
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+}
+
+.search-container input[type="text"] {
+  padding: 10px;
+  font-size: 18px;
+  width: 70%;
+  border: 1px solid #ccc;
+  border-radius: 5px 0 0 5px;
+}
+
+.search-container button {
+  padding: 10px 20px;
+  font-size: 18px;
+  background-color: #4CAF50;
+  color: white;
+  border: 1px solid #4CAF50;
+  border-radius: 0 5px 5px 0;
+  cursor: pointer;
+}
+
+
+#recipeList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.recipeCard {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.recipeCard:hover {
+  transform: translateY(-5px);
+}
+
+.recipeCard img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 5px;
+}
+
+.recipeCard h3 {
+  margin-top: 10px;
+}
+
+.recipeCard p {
+  color: #666;
+}
+
+#recipeDetails {
+  display: none;
+  background-color: rgba(255, 255, 255, 0.9); 
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  overflow-y: auto; 
+}
+
+#recipeDetailsContent {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 600px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+}
+
+#recipeDetails h2 {
+  margin-top: 0;
+}
+
+#recipeDetails img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+#recipeDetails h3 {
+  margin-top: 20px;
+}
+
+#recipeDetails ul,
+#recipeDetails ol {
+  margin-left: 20px;
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Recipe Search App</h1>
+  <input type="text" id="searchInput" placeholder="Search recipes...">
+  <button onclick="searchRecipes()">Search</button>
+</header>
+
+<div id="recipeList"></div>
+
+<div id="recipeDetails" style="display: none;">
+  <h2 id="recipeTitle"></h2>
+  <img id="recipeImage" src="" alt="Recipe Image">
+  <h3>Instructions:</h3>
+  <p id="recipeDescription"></p>
+  <h3>Ingredients:</h3>
+  <ul id="recipeIngredients"></ul>
+</div>
+
+<script>
+const spoonacularApiKey = 'e9143b739c8f48ff8c5b6779c30eb4bd';
+const edamamApiKey = 'bbe53d6d6b24277c8cb48a5d1cd7f3af';
+const edamamAppId = 'eb19ca4a';
+
+function searchRecipes() {
+  const searchInput = document.getElementById('searchInput').value;
+  const spoonacularUrl = `https://api.spoonacular.com/recipes/search?query=${searchInput}&apiKey=${spoonacularApiKey}&number=10`;
+  const edamamUrl = `https://api.edamam.com/search?q=${searchInput}&app_id=${edamamAppId}&app_key=${edamamApiKey}&from=0&to=10`;
+
+  fetch(spoonacularUrl)
+    .then(response => response.json())
+    .then(data => displayRecipes(data.results))
+    .catch(error => console.log('Error fetching recipes from Spoonacular:', error));
+
+  
+  fetch(edamamUrl)
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => console.log('Error fetching recipes from Edamam:', error));
+}
+
+function displayRecipes(recipes) {
+  const recipeList = document.getElementById('recipeList');
+  recipeList.innerHTML = '';
+
+  recipes.forEach(recipe => {
+    const recipeCard = document.createElement('div');
+    recipeCard.classList.add('recipeCard');
+	
+
+    const title = document.createElement('h3');
+    title.textContent = recipe.title;
+    recipeCard.appendChild(title);
+
+    const description = document.createElement('p');
+    description.textContent = recipe.sourceName;
+    recipeCard.appendChild(description);
+
+    recipeCard.addEventListener('click', () => showRecipeDetails(recipe.id));
+
+    recipeList.appendChild(recipeCard);
+  });
+}
+
+function showRecipeDetails(recipeId) {
+  const spoonacularDetailUrl = `https://api.spoonacular.com/recipes/${recipeId}/information?apiKey=${spoonacularApiKey}`;
+
+  fetch(spoonacularDetailUrl)
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('recipeTitle').textContent = data.title;
+      document.getElementById('recipeImage').src = data.image;
+      document.getElementById('recipeDescription').textContent = data.instructions || 'No instructions provided';
+
+      const ingredientsList = document.getElementById('recipeIngredients');
+      ingredientsList.innerHTML = '';
+      if (data.extendedIngredients) {
+        data.extendedIngredients.forEach(ingredient => {
+          const item = document.createElement('li');
+          item.textContent = ingredient.original;
+          ingredientsList.appendChild(item);
+        });
+      } else {
+        const item = document.createElement('li');
+        item.textContent = 'No ingredients provided';
+        ingredientsList.appendChild(item);
+      }
+
+      document.getElementById('recipeDetails').style.display = 'block';
+    })
+    .catch(error => console.log('Error fetching recipe details:', error));
+}
+
+document.getElementById('recipeDetails').addEventListener('click', function(event) {
+  if (event.target.id === 'recipeDetails') {
+    closeRecipeDetails();
+  }
+});
+
+function closeRecipeDetails() {
+  document.getElementById('recipeTitle').textContent = '';
+  document.getElementById('recipeImage').src = '';
+  document.getElementById('recipeDescription').textContent = '';
+  document.getElementById('recipeIngredients').innerHTML = '';
+  document.getElementById('recipeDetails').style.display = 'none';
+}
+</script>
+</body>
+</html>
